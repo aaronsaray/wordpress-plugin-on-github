@@ -10,7 +10,7 @@ Please note that this does not support private repos at this time.
 Install the latest version with
 
 ```bash
-$ composer require aaronsaray/php-flow-control
+$ composer require wpog/wordpress-plugin-on-github
 ```
 
 ## Usage as a Composer Library
