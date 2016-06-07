@@ -64,13 +64,9 @@ class UpdateWatcher
      * Add in plugin information in order to get updates
      * @param $transient object
      * @return object
-     * @throws \Exception
      */
     public function filterPreSetSiteTransientUpdatePlugins($transient)
     {
-        // If we have checked the plugin data before, don't re-check
-        if (empty($transient->checked)) return $transient;
-        
         $this->updatePluginData();
         $this->updateGithubData();
 
@@ -108,7 +104,7 @@ class UpdateWatcher
 
         $response->last_updated = $this->githubLatestRelease['published_at'];
         $response->slug = $this->pluginBaseName;
-        $response->plugin_name  = $this->pluginData["Name"];
+        $response->name  = $this->pluginData["Name"];
         $response->version = $this->githubLatestRelease['tag_name'];
         $response->author = $this->pluginData["AuthorName"];
         $response->homepage = $this->pluginData["PluginURI"];
@@ -164,9 +160,8 @@ class UpdateWatcher
 
     /**
      * Update the data from GitHub
-     * 
+     *
      * @return bool
-     * @throws \Exception
      */
     protected function updateGithubData()
     {
@@ -175,20 +170,23 @@ class UpdateWatcher
         $url = \esc_url_raw("https://api.github.com/repos/{$this->githubNamespace}/{$this->githubProject}/releases");
         $response = \wp_remote_retrieve_body(\wp_remote_get($url));
         if (is_wp_error($response)) {
-            throw new \Exception($response->get_error_message());
+            error_log($response->get_error_message());
+            return false;
         }
 
         $jsonDecodedResponse = json_decode($response, true);
         if (is_null($jsonDecodedResponse)) {
-            throw new \Exception('Unable to parse response: ' . json_last_error_msg());
+            error_log('Unable to parse response: ' . json_last_error_msg());
+            return false;
         }
 
         if (empty($jsonDecodedResponse[0])) {
-            throw new \Exception('There is no release information gathered.');
+            error_log('There is no release information gathered.');
+            return false;
         }
 
         $this->githubLatestRelease = $jsonDecodedResponse[0];
-        
+
         return true;
     }
 }
