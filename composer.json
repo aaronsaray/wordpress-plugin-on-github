@@ -15,6 +15,6 @@
     "erusev/parsedown": "^1.6"
   },
   "autoload": {
-    "psr-4": {"wpog\\": "src"}
+    "psr-4": {"WPOG\\": "src"}
   }
 }
